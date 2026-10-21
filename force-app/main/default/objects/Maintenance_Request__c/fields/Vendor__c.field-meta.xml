@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Vendor__c</fullName>
+    <description>Auto-assigned to the active vendor with the least open workload when left blank.</description>
+    <label>Vendor</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>Vendor__c</referenceTo>
+    <relationshipLabel>Maintenance Requests</relationshipLabel>
+    <relationshipName>Maintenance_Requests</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

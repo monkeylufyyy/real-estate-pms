@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <label>Lease Status</label>
+    <formula>IF(TODAY() &lt; Start_Date__c, &quot;Upcoming&quot;, IF(TODAY() &gt; End_Date__c, &quot;Expired&quot;, &quot;Active&quot;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <type>Text</type>
+</CustomField>
