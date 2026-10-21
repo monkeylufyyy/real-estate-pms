@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Location" icon-name="standard:location">
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={error}>
+                <p class="slds-text-color_error">The location could not be loaded.</p>
+            </template>
+            <template lwc:elseif={hasMarkers}>
+                <lightning-map map-markers={mapMarkers} zoom-level="15"
+                    markers-title="Property location"></lightning-map>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{statusText}</p>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak">Add an address to see the property on the map.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,97 @@
+<template>
+    <lightning-card title="New Property" icon-name="standard:household">
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={errorMessage}>
+                <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small" role="alert">
+                    <span class="slds-assistive-text">Error</span>
+                    <h2>{errorMessage}</h2>
+                </div>
+            </template>
+
+            <div class="slds-grid slds-wrap slds-gutters_small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input label="Property Name" data-field="Name" required value={form.Name}
+                        onchange={handleChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input label="Address" data-field="Address__c" required value={form.Address__c}
+                        onchange={handleChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input label="City" data-field="City__c" required value={form.City__c}
+                        onchange={handleChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input label="State" data-field="State__c" required value={form.State__c}
+                        onchange={handleChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input label="Postal Code" data-field="Postal_Code__c" required
+                        value={form.Postal_Code__c} onchange={handleChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input label="Country" data-field="Country__c" required value={form.Country__c}
+                        onchange={handleChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-combobox label="Type" data-field="Type__c" required options={typeOptions}
+                        value={form.Type__c} onchange={handleChange}></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-combobox label="Furnishing Status" data-field="Furnishing_Status__c"
+                        options={furnishingOptions} value={form.Furnishing_Status__c}
+                        onchange={handleChange}></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-combobox label="Status" data-field="Status__c" required options={statusOptions}
+                        value={form.Status__c} onchange={handleChange}></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input type="number" label="Rent (per month)" data-field="Rent__c" required min="0.01"
+                        step="0.01" value={form.Rent__c} onchange={handleChange}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1">
+                    <lightning-textarea label="Description" data-field="Description__c" required
+                        value={form.Description__c} onchange={handleChange}></lightning-textarea>
+                </div>
+            </div>
+
+            <div class="slds-m-top_medium">
+                <lightning-input type="file" label="Property images (required)" accept="image/*" multiple
+                    onchange={handleFiles}></lightning-input>
+                <template lwc:if={imageError}>
+                    <div class="slds-text-color_error slds-m-top_xx-small">{imageError}</div>
+                </template>
+
+                <template lwc:if={hasFiles}>
+                    <div class="slds-grid slds-wrap slds-gutters_small slds-m-top_small">
+                        <template for:each={files} for:item="entry">
+                            <div key={entry.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-m-bottom_small">
+                                <div class="slds-box slds-box_x-small">
+                                    <img src={entry.preview} alt={entry.name} class="preview" />
+                                    <div class="slds-truncate slds-text-body_small" title={entry.name}>{entry.name}</div>
+                                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                        <span class="slds-text-body_small slds-text-color_weak">{entry.sizeLabel}</span>
+                                        <lightning-button-icon icon-name="utility:delete" size="small"
+                                            variant="bare" alternative-text="Remove image" data-key={entry.key}
+                                            onclick={handleRemove}></lightning-button-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div slot="footer">
+            <lightning-button label="Cancel" onclick={handleCancel} disabled={isSaving}
+                class="slds-m-right_x-small"></lightning-button>
+            <lightning-button label={saveLabel} variant="brand" onclick={handleSave}
+                disabled={isSaving}></lightning-button>
+        </div>
+        <template lwc:if={isSaving}>
+            <lightning-spinner alternative-text="Saving property" size="small"></lightning-spinner>
+        </template>
+    </lightning-card>
+</template>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <description>Overrides the standard New action on Property so a property can only be created together with images.</description>
+</AuraDefinitionBundle>

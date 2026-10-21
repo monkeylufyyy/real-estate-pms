@@ -1,0 +1,39 @@
+<template>
+    <lightning-card title={heading} icon-name="standard:photo">
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={isLoading}>
+                <lightning-spinner alternative-text="Loading images" size="small"></lightning-spinner>
+            </template>
+
+            <template lwc:if={showEmptyWarning}>
+                <div class="slds-notify slds-notify_alert slds-alert_warning slds-m-bottom_small" role="alert">
+                    <h2>This property has no images. Upload at least one below.</h2>
+                </div>
+            </template>
+
+            <template lwc:if={hasImages}>
+                <div class="slds-grid slds-wrap slds-gutters_small">
+                    <template for:each={images} for:item="img">
+                        <div key={img.documentId} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-m-bottom_small">
+                            <div class="tile">
+                                <a href={img.url} target="_blank" rel="noopener noreferrer">
+                                    <img src={img.src} data-fallback={img.fallback} alt={img.title}
+                                        onerror={handleImageError} />
+                                </a>
+                                <template lwc:if={canDelete}>
+                                    <lightning-button-icon icon-name="utility:delete" size="small" variant="border-filled"
+                                        alternative-text="Remove image" class="delete" data-id={img.documentId}
+                                        onclick={handleDelete}></lightning-button-icon>
+                                </template>
+                            </div>
+                            <div class="slds-truncate slds-text-body_small" title={img.title}>{img.title}</div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <lightning-file-upload label="Add images" name="propertyImages" record-id={recordId}
+                accept={acceptedFormats} multiple onuploadfinished={handleUploadFinished}></lightning-file-upload>
+        </div>
+    </lightning-card>
+</template>

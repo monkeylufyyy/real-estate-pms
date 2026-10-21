@@ -1,0 +1,143 @@
+<template>
+    <lightning-card title="Properties" icon-name="standard:household">
+        <div slot="actions">
+            <lightning-button label="New Property" variant="brand" onclick={handleNew}></lightning-button>
+        </div>
+
+        <div class="slds-p-horizontal_medium">
+            <!-- Filters -->
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-bottom_medium">
+                <div class="slds-grid slds-wrap slds-gutters_small">
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-input type="number" label="Min price" data-field="minRent" value={minRent}
+                            min="0" step="0.01" onchange={handleInput}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-input type="number" label="Max price" data-field="maxRent" value={maxRent}
+                            min="0" step="0.01" onchange={handleInput}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-combobox label="Availability" data-field="status" value={status}
+                            options={statusOptions} onchange={handleInput}></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-combobox label="Furnishing" data-field="furnishing" value={furnishing}
+                            options={furnishingOptions} onchange={handleInput}></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-combobox label="Type" data-field="propertyType" value={propertyType}
+                            options={typeOptions} onchange={handleInput}></lightning-combobox>
+                    </div>
+                </div>
+
+                <div class="slds-grid slds-wrap slds-gutters_small slds-m-top_x-small slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-input type="number" label="Nearby distance (km)" data-field="distanceKm"
+                            value={distanceKm} min="0.1" step="0.1" onchange={handleInput}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-input type="number" label="My latitude" data-field="latitude" value={latitude}
+                            min="-90" max="90" step="any" onchange={handleInput}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-input type="number" label="My longitude" data-field="longitude" value={longitude}
+                            min="-180" max="180" step="any" onchange={handleInput}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                        <lightning-button label="Use my location" icon-name="utility:location"
+                            onclick={handleUseMyLocation} disabled={locating}></lightning-button>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-6 slds-text-align_right">
+                        <lightning-button label="Clear" onclick={handleClear} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label="Apply filters" variant="brand" onclick={handleApply}></lightning-button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                <div class="slds-text-body_regular">
+                    <b>{rangeLabel}</b>
+                    <template lwc:if={nearbyActive}>
+                        <span class="slds-m-left_small slds-text-color_weak">sorted by distance</span>
+                    </template>
+                </div>
+            </div>
+
+            <div class="results">
+                <template lwc:if={isLoading}>
+                    <lightning-spinner alternative-text="Loading properties" size="medium"></lightning-spinner>
+                </template>
+
+                <template lwc:if={hasRows}>
+                    <div class="slds-grid slds-wrap slds-gutters_small">
+                        <template for:each={rows} for:item="row">
+                            <div key={row.id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-m-bottom_small">
+                                <article class="slds-card property-card">
+                                    <div class="image-wrap">
+                                        <template lwc:if={row.imageSrc}>
+                                            <img src={row.imageSrc} data-fallback={row.imageUrl} alt={row.name}
+                                                onerror={handleImageError} />
+                                        </template>
+                                        <template lwc:else>
+                                            <div class="no-image slds-text-color_weak">No image</div>
+                                        </template>
+                                    </div>
+                                    <div class="slds-card__body slds-card__body_inner slds-p-top_small">
+                                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                                            <lightning-button variant="base" label={row.name} data-id={row.id}
+                                                onclick={handleOpen} class="slds-text-heading_small"></lightning-button>
+                                            <span class={row.badgeClass}>{row.status}</span>
+                                        </div>
+                                        <p class="slds-text-heading_medium slds-m-vertical_xx-small">
+                                            <lightning-formatted-number value={row.rent} format-style="currency"
+                                                currency-code={currencyCode} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            <span class="slds-text-body_small slds-text-color_weak"> / month</span>
+                                        </p>
+                                        <p class="slds-text-body_small">{row.subtitle}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak">{row.address}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak">{row.location}</p>
+                                        <template lwc:if={row.hasDistance}>
+                                            <p class="slds-text-body_small slds-m-top_xx-small">
+                                                <lightning-icon icon-name="utility:location" size="xx-small"></lightning-icon>
+                                                {row.distanceKm} km away
+                                            </p>
+                                        </template>
+                                    </div>
+                                </article>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <template lwc:elseif={isLoading}>
+                    <div class="slds-p-vertical_xx-large"></div>
+                </template>
+                <template lwc:else>
+                    <div class="slds-illustration slds-illustration_small slds-p-vertical_large slds-text-align_center">
+                        <p class="slds-text-heading_small">No properties match these filters</p>
+                        <p class="slds-text-color_weak">Try widening the price range or distance.</p>
+                    </div>
+                </template>
+            </div>
+
+            <template lwc:if={truncated}>
+                <div class="slds-text-color_weak slds-text-body_small slds-m-top_x-small">
+                    Only the first 2,025 matches can be paged through. Narrow the filters to see the rest.
+                </div>
+            </template>
+
+            <!-- Pagination -->
+            <div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center slds-m-vertical_medium">
+                <lightning-button-icon icon-name="utility:left" alternative-text="First page" variant="border-filled"
+                    disabled={isFirstPage} onclick={handleFirst} class="slds-m-right_xx-small"></lightning-button-icon>
+                <lightning-button label="Previous" icon-name="utility:chevronleft" disabled={isFirstPage}
+                    onclick={handlePrevious}></lightning-button>
+                <span class="slds-m-horizontal_medium">{pageLabel}</span>
+                <lightning-button label="Next" icon-name="utility:chevronright" icon-position="right"
+                    disabled={isLastPage} onclick={handleNext}></lightning-button>
+                <lightning-button-icon icon-name="utility:right" alternative-text="Last page" variant="border-filled"
+                    disabled={isLastPage} onclick={handleLast} class="slds-m-left_xx-small"></lightning-button-icon>
+            </div>
+        </div>
+    </lightning-card>
+</template>
